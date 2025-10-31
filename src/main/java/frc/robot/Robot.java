@@ -4,7 +4,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
@@ -35,6 +39,9 @@ public class Robot extends TimedRobot {
   private TalonFXConfiguration frontRightConfig = new TalonFXConfiguration();
   private TalonFXConfiguration backLeftConfig = new TalonFXConfiguration();
   private TalonFXConfiguration backRightConfig = new TalonFXConfiguration();
+
+  private final Compressor compressor = new Compressor(10, PneumaticsModuleType.CTREPCM);
+  //private Solenoid solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
