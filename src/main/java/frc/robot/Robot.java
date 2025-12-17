@@ -5,12 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -41,7 +43,7 @@ public class Robot extends TimedRobot {
   private TalonFXConfiguration backRightConfig = new TalonFXConfiguration();
 
   private final Compressor compressor = new Compressor(10, PneumaticsModuleType.CTREPCM);
-  //private Solenoid solenoid = new Solenoid(PneumaticsModuleType.CTREPCM, 0);
+  private Solenoid solenoid = new Solenoid(10, PneumaticsModuleType.CTREPCM, 0);
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -79,10 +81,15 @@ public class Robot extends TimedRobot {
 
     m_robotDrive = new DifferentialDrive(frontLeftTalon::set, frontRightTalon::set);
     m_leftStick = new Joystick(0);
+
+    solenoid.setPulseDuration(0.5);
   }
 
   @Override
   public void teleopPeriodic() {
     m_robotDrive.tankDrive(-m_leftStick.getRawAxis(1), -m_leftStick.getRawAxis(5));  // Raw Axis values for Logitech F310
+    if (m_leftStick.getRawButtonReleased(1)) { // A button is #1
+      solenoid.startPulse();
+    }
   }
 }
