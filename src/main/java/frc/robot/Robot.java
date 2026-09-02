@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -28,7 +30,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 //test comment to test pushing
 public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive;
-  private final Joystick m_leftStick;
+  private final CommandXboxController m_controller;
 
   private final TalonFX frontLeftTalon = new TalonFX(1, "rio");
   private final TalonFX frontRightTalon = new TalonFX(3, "rio");
@@ -81,16 +83,20 @@ public class Robot extends TimedRobot {
     backRightTalon.setControl(frontRightTalonFollower);
 
     m_robotDrive = new DifferentialDrive(frontLeftTalon::set, frontRightTalon::set);
-    m_leftStick = new Joystick(0);
+    m_controller = new CommandXboxController(0);
 
     solenoid.setPulseDuration(0.5);
   }
 
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.tankDrive(-m_leftStick.getRawAxis(1), -m_leftStick.getRawAxis(5));  // Raw Axis values for Logitech F310
-    if (m_leftStick.getRawButtonReleased(1)) { // A button is #1
-      solenoid.startPulse();
-    }
+    m_robotDrive.tankDrive(-m_controller.getRawAxis(1), -m_controller.getRawAxis(5));  // Raw Axis values for Logitech F310
+
+    m_controller.a().onTrue(new InstantCommand(() -> solenoid.startPulse()));
+    
+    m_controller.b().onTrue(new InstantCommand(() -> compressor.disable()));
+    m_controller.x().onTrue(new InstantCommand(() -> compressor.enableDigital()));
+
+    SmartDashboard.putNumber("Digital Pressure Reading", compressor.getPressure());
   }
 }
