@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -30,7 +28,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 //test comment to test pushing
 public class Robot extends TimedRobot {
   private final DifferentialDrive m_robotDrive;
-  private final CommandXboxController m_controller;
+  private final Joystick m_leftStick;
 
   private final TalonFX frontLeftTalon = new TalonFX(1, "rio");
   private final TalonFX frontRightTalon = new TalonFX(3, "rio");
@@ -47,6 +45,8 @@ public class Robot extends TimedRobot {
 
   private final Compressor compressor = new Compressor(10, PneumaticsModuleType.CTREPCM);
   private Solenoid solenoid = new Solenoid(10, PneumaticsModuleType.CTREPCM, 0);
+
+  double pulseDuration = 0.2d;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -83,20 +83,26 @@ public class Robot extends TimedRobot {
     backRightTalon.setControl(frontRightTalonFollower);
 
     m_robotDrive = new DifferentialDrive(frontLeftTalon::set, frontRightTalon::set);
-    m_controller = new CommandXboxController(0);
+    m_leftStick = new Joystick(0);
 
-    solenoid.setPulseDuration(0.5);
+    solenoid.setPulseDuration(pulseDuration);
   }
 
   @Override
   public void teleopPeriodic() {
-    m_robotDrive.tankDrive(-m_controller.getRawAxis(1), -m_controller.getRawAxis(5));  // Raw Axis values for Logitech F310
+    SmartDashboard.putNumber("pulseDuration", pulseDuration);
 
-    m_controller.a().onTrue(new InstantCommand(() -> solenoid.startPulse()));
-    
-    m_controller.b().onTrue(new InstantCommand(() -> compressor.disable()));
-    m_controller.x().onTrue(new InstantCommand(() -> compressor.enableDigital()));
+    m_robotDrive.tankDrive(-m_leftStick.getRawAxis(1), -m_leftStick.getRawAxis(5));  // Raw Axis values for Logitech F310
+    if (m_leftStick.getRawButtonReleased(1)) { // A button is #1
+      solenoid.startPulse();
+    }
 
-    SmartDashboard.putNumber("Digital Pressure Reading", compressor.getPressure());
+    if (m_leftStick.getRawButtonReleased(3)) { // X Button is #3
+      pulseDuration -= 0.01;
+    }
+
+    if (m_leftStick.getRawButton(2)) { // B Button is #2
+      pulseDuration += 0.01;
+    }
   }
 }
