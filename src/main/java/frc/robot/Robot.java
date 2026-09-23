@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
       pulseDuration -= 0.01;
     }
 
-    if (m_leftStick.getRawButton(2)) { // B Button is #2
+    if (m_leftStick.getRawButtonReleased(2)) { // B Button is #2
       pulseDuration += 0.01;
     }
   }
