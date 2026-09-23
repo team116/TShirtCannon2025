@@ -92,7 +92,11 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     SmartDashboard.putNumber("pulseDuration", pulseDuration);
 
-    m_robotDrive.tankDrive(-m_leftStick.getRawAxis(1), -m_leftStick.getRawAxis(5));  // Raw Axis values for Logitech F310
+     // Raw Axis values for Logitech F310
+    double leftMotorSpeed = shapeJoystickInput(-m_leftStick.getRawAxis(1));
+    double rightMotorSpeed = shapeJoystickInput(-m_leftStick.getRawAxis(5));
+
+    m_robotDrive.tankDrive(leftMotorSpeed, rightMotorSpeed);
     if (m_leftStick.getRawButtonReleased(1)) { // A button is #1
       solenoid.startPulse();
     }
@@ -104,5 +108,9 @@ public class Robot extends TimedRobot {
     if (m_leftStick.getRawButtonReleased(2)) { // B Button is #2
       pulseDuration += 0.01;
     }
+  }
+
+  private double shapeJoystickInput(double rawInput) {
+    return Math.pow(rawInput, 3) * 0.5;
   }
 }
