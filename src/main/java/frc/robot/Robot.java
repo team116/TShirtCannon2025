@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
   private Solenoid solenoid = new Solenoid(10, PneumaticsModuleType.CTREPCM, 0);
 
   double pulseDuration = 0.2d;
+  boolean compressorEnabled = true;
 
   /** Called once at the beginning of the robot program. */
   public Robot() {
@@ -108,9 +109,19 @@ public class Robot extends TimedRobot {
     if (m_leftStick.getRawButtonReleased(2)) { // B Button is #2
       pulseDuration += 0.01;
     }
+
+    if (m_leftStick.getRawButtonReleased(4)) { // Y Button is #4
+      if (compressorEnabled) {
+        compressor.disable();
+        compressorEnabled = false;
+      } else {
+        compressor.enableDigital();
+        compressorEnabled = true;
+      }
+    }
   }
 
   private double shapeJoystickInput(double rawInput) {
-    return Math.pow(rawInput, 3) * 0.5;
+    return Math.pow(rawInput, 3) * 0.75;
   }
 }
